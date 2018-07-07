@@ -1,0 +1,4 @@
+{:paths ["src"]
+ :deps {com.doubleelbow/capital {:local/root "../core"}}
+ :aliases {:dev {:extra-paths ["dev"]
+                 :extra-deps {org.clojure/tools.namespace {:mvn/version "0.3.0-alpha1"}}}}}
