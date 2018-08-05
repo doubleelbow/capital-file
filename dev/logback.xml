@@ -1,0 +1,24 @@
+<configuration scan="true" scanPeriod="10 seconds">
+
+  <!-- Console output -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoder defaults to ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+    <encoder>
+      <pattern>%-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <!-- Log everything -->
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>ALL</level>
+    </filter>
+  </appender>
+
+  <!-- Enable STDOUT appender for all log messages.
+       Log everything by default. -->
+  <root level="ALL">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+  <!-- For loggers in the these namespaces, log at all levels. -->
+  <logger name="user" level="ALL" />
+
+</configuration>

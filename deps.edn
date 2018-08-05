@@ -1,4 +1,11 @@
 {:paths ["src"]
- :deps {com.doubleelbow/capital {:local/root "../core"}}
+ :deps {com.doubleelbow/capital {:local/root "../core"}
+        io.pedestal/pedestal.log {:mvn/version "0.5.4"}
+        pathetic {:mvn/version "0.5.1"}
+        clj-time {:mvn/version "0.14.4"}}
  :aliases {:dev {:extra-paths ["dev"]
-                 :extra-deps {org.clojure/tools.namespace {:mvn/version "0.3.0-alpha1"}}}}}
+                 :extra-deps {org.clojure/tools.namespace {:mvn/version "0.3.0-alpha1"}
+                              ch.qos.logback/logback-classic {:mvn/version "1.1.7" :exclusions [org.slf4j/slf4j-api]}
+                              org.slf4j/jul-to-slf4j {:mvn/version "1.7.21"}
+                              org.slf4j/jcl-over-slf4j {:mvn/version "1.7.21"}
+                              org.slf4j/log4j-over-slf4j {:mvn/version "1.7.21"}}}}}
