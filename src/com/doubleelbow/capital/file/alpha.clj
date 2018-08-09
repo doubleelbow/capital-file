@@ -1,5 +1,7 @@
 (ns com.doubleelbow.capital.file.alpha
   (:require [clojure.core.async :refer [<!!]]
+            [clojure.xml :as xml]
+            [clojure.edn :as edn]
             [clojure.java.io :as io]
             [com.doubleelbow.capital.alpha :as capital]
             [com.doubleelbow.capital.interceptor.alpha :as interceptor]
@@ -85,6 +87,26 @@
                               context))
                           context))})
 
+(defn- get-extension-from-path [path]
+  (let [file-name (.getName (io/file path))
+        extension-point-index (.lastIndexOf file-name (int \.))]
+    (if (not= -1 extension-point-index)
+      (.substring file-name (inc extension-point-index))
+      "txt")))
+
+(defn- format-intc [format-config]
+  {::interceptor/name ::format
+   ::interceptor/init {::read-fmt (merge {"txt" #(identity %)
+                                          "edn" #(clojure.edn/read-string %)
+                                          "xml" #(-> %
+                                                     .getBytes
+                                                     java.io.ByteArrayInputStream.
+                                                     xml/parse)}
+                                         format-config)}
+   ::interceptor/down (fn [context]
+                        (let [extension (get-extension-from-path (file-path context))]
+                          (update context ::capital/response (get (::read-fmt context) extension identity))))})
+
 (defn- nonexistent-file-intc [val]
   {::interceptor/name ::nonexistent-file
    ::interceptor/init {::nonexistent val}
@@ -106,6 +128,7 @@
 (defn initial-context [config]
   (let [interceptors [(absolute-path-intc (::base-path config))
                       (cache-intc (get-in config [::read-opts ::cache]))
+                      (format-intc (get-in config [::read-opts ::format-config] {}))
                       (nonexistent-file-intc (get-in config [::read-opts ::nonexistent]))
                       blocking-read-intc]]
     (-> (capital/initial-context :file :capital-file interceptors)
