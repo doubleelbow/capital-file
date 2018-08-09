@@ -8,6 +8,21 @@
             [clj-time.coerce :as c]
             [io.pedestal.log :as log]))
 
+(defprotocol FileSystem
+  (exists [this path])
+  (content [this path])
+  (last-change-date [this path]))
+
+(defrecord SimpleFileSystem []
+  FileSystem
+  (exists [this path]
+    (.exists (io/file path)))
+  (content [this path]
+    (log/debug :msg "reading content" :path path)
+    (slurp path))
+  (last-change-date [this path]
+    (c/from-long (.lastModified (io/file path)))))
+
 (defn- absolute-path-intc [base-path]
   {::interceptor/name ::absolute-path
    ::interceptor/init {::base-path (pathetic/resolve "." base-path)}
@@ -23,12 +38,9 @@
 (defn- use-cache? [context]
   (get-in context [::capital/request ::use-cache?] (get-in context [::cache ::use-cache?] false)))
 
-(defn- last-modified-date [file-path]
-  (c/from-long (.lastModified (io/file file-path))))
-
-(defn- is-changed? [file-path content-date]
+(defn- is-changed? [file-system file-path content-date]
   (if content-date
-    (t/after? (last-modified-date file-path) content-date)
+    (t/after? (last-change-date file-system file-path) content-date)
     true))
 
 (defn- expired? [current-time obtained duration]
@@ -42,8 +54,9 @@
     (cond
       (not (use-cache? context)) "not allowed to use cache"
       (nil? cache) "no cached value"
-      (and check-if-newer? (is-changed? path (::date cache))) "file has changed"
-      (expired? (t/now) (::obtained cache) duration) "cache has expired")))
+      (and check-if-newer? (is-changed? (::file-system context) path (::date cache))) "file has changed"
+      (and (expired? (apply (::current-time context) [context]) (::obtained cache) duration)
+           (or (not check-if-newer?) (is-changed? (::file-system context) path (::date cache)))) "cache has expired")))
 
 (defn- cache-intc [cache-config]
   {::interceptor/name ::file-cache
@@ -65,8 +78,8 @@
                         (if (and (use-cache? context) (not (contains? context :not-found)))
                           (let [path (file-path context)
                                 c {::content (::capital/response context)
-                                   ::obtained (t/now)
-                                   ::date (last-modified-date path)}]
+                                   ::obtained (apply (::current-time context) [context])
+                                   ::date (last-change-date (::file-system context) path)}]
                             (do
                               (swap! (::cached-values context) assoc path c)
                               context))
@@ -77,7 +90,7 @@
    ::interceptor/init {::nonexistent val}
    ::interceptor/up (fn [context]
                       (let [nonexistent (get-in context [::capital/request ::nonexistent] (::nonexistent context ::throw-if-nonexistent))]
-                        (if (or (= ::throw-if-nonexistent nonexistent) (.exists (io/file (get-in context [::capital/request ::path]))))
+                        (if (or (= ::throw-if-nonexistent nonexistent) (exists (::file-system context) (file-path context)))
                           context
                           (-> context
                               (assoc ::capital/response nonexistent)
@@ -87,21 +100,25 @@
 (def ^:private blocking-read-intc
   {::interceptor/name ::sync-read
    ::interceptor/up (fn [context]
-                      (assoc context ::capital/response (slurp (get-in context [::capital/request ::path]))))})
+                      (assoc context ::capital/response (content (::file-system context) (file-path context))))})
 
 
 (defn initial-context [config]
-  (capital/initial-context :file :capital-file [(absolute-path-intc (::base-path config)) (cache-intc (get-in config [::read-opts ::cache])) (nonexistent-file-intc (get-in config [::read-opts ::nonexistent])) blocking-read-intc]))
+  (let [interceptors [(absolute-path-intc (::base-path config))
+                      (cache-intc (get-in config [::read-opts ::cache]))
+                      (nonexistent-file-intc (get-in config [::read-opts ::nonexistent]))
+                      blocking-read-intc]]
+    (-> (capital/initial-context :file :capital-file interceptors)
+        (assoc ::file-system (::file-system config (->SimpleFileSystem)))
+        (assoc ::current-time (::current-time config #(t/now))))))
 
 (defn read!
   ([path context]
    (read! path context {}))
   ([path context {nonexistent ::nonexistent use-cache ::use-cache?}]
+   (log/debug :msg "executing read!" :path path)
    (let [request (cond-> {}
-                   true (assoc ::path path
-                               ;;::use-cache? false
-                               )                 
-                   nonexistent (assoc ::nonexistent nonexistent)
-                   ;;use-cache (assoc ::use-cache? use-cache)
-                   )]
+                   true (assoc ::path path)                 
+                   (not (nil? nonexistent)) (assoc ::nonexistent nonexistent)
+                   (not (nil? use-cache)) (assoc ::use-cache? use-cache))]
      (<!! (capital/<send! request context)))))
