@@ -1,4 +1,4 @@
-(defproject com.doubleelbow/capital.file "0.1.0-SNAPSHOT"
+(defproject com.doubleelbow.capital/capital-file "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "https://github.com/doubleelbow/capital-file"
   :license {:name "Eclipse Public License"

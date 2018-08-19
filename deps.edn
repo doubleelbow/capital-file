@@ -1,5 +1,5 @@
 {:paths ["src"]
- :deps {com.doubleelbow/capital {:local/root "../core"}
+ :deps {com.doubleelbow.capital/capital {:mvn/version "0.1.0-SNAPSHOT"}
         io.pedestal/pedestal.log {:mvn/version "0.5.4"}
         pathetic {:mvn/version "0.5.1"}
         clj-time {:mvn/version "0.14.4"}}
@@ -9,4 +9,5 @@
                               org.slf4j/jul-to-slf4j {:mvn/version "1.7.21"}
                               org.slf4j/jcl-over-slf4j {:mvn/version "1.7.21"}
                               org.slf4j/log4j-over-slf4j {:mvn/version "1.7.21"}
-                              org.clojure/data.json {:mvn/version "0.2.6"}}}}}
+                              org.clojure/data.json {:mvn/version "0.2.6"}
+                              com.doubleelbow.capital/capital {:local/root "../core"}}}}}
