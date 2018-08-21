@@ -131,7 +131,7 @@
                       (format-intc (get-in config [::read-opts ::format-config] {}))
                       (nonexistent-file-intc (get-in config [::read-opts ::nonexistent]))
                       blocking-read-intc]]
-    (-> (capital/initial-context :file :capital-file interceptors)
+    (-> (capital/initial-context :capital-file interceptors)
         (assoc ::file-system (::file-system config (->SimpleFileSystem)))
         (assoc ::current-time (::current-time config #(t/now))))))
 
