@@ -1,10 +1,10 @@
-# capital file
+# capital file [![Clojars Project](https://img.shields.io/clojars/v/com.doubleelbow.capital/capital-file.svg)](https://clojars.org/com.doubleelbow.capital/capital-file)
 
 Capital-file is a clojure library built on top of [capital](https://github.com/doubleelbow/capital) that provides cacheable file reads.
 
 ## Usage
 
-Simple usage example can be found in `dev/user.clj` or at [capital example](https://github.com/doubleelbow/capital-example).
+Simple usage examples can be found in `dev/user.clj` and at [capital example](https://github.com/doubleelbow/capital-example).
 
 Currently there are two public functions (`initial-context` and `read!`) in `com.doubleelbow.capital.file.alpha` namespace. `initial-context` creates a context (based on config map - explained later) which is then passed to `read!` along with absolute or relative file path.
 

@@ -1,5 +1,5 @@
 (defproject com.doubleelbow.capital/capital-file "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "capital library for file manipulation"
   :url "https://github.com/doubleelbow/capital-file"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
