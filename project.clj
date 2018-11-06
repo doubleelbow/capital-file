@@ -13,4 +13,11 @@
                                   [org.slf4j/jul-to-slf4j "1.7.21"]
                                   [org.slf4j/jcl-over-slf4j "1.7.21"]
                                   [org.slf4j/log4j-over-slf4j "1.7.21"]
-                                  [org.clojure/data.json "0.2.6"]]}})
+                                  [org.clojure/data.json "0.2.6"]]
+                   :plugins [[com.doubleelbow/lein-deploy-prepared "0.1.0"]]}}
+  :repositories [["snapshots" {:url "https://repo.clojars.org"
+                               :username :env/clojars_user
+                               :password :env/clojars_pass}]
+                 ["releases" {:url "https://repo.clojars.org"
+                              :username :env/clojars_user
+                              :password :env/clojars_pass}]])
