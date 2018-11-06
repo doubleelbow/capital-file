@@ -1,4 +1,4 @@
-# capital file [![Clojars Project](https://img.shields.io/clojars/v/com.doubleelbow.capital/capital-file.svg)](https://clojars.org/com.doubleelbow.capital/capital-file)
+# capital file [![CircleCI](https://circleci.com/gh/doubleelbow/capital-file.svg?style=svg)](https://circleci.com/gh/doubleelbow/capital-file) [![Clojars Project](https://img.shields.io/clojars/v/com.doubleelbow.capital/capital-file.svg)](https://clojars.org/com.doubleelbow.capital/capital-file)
 
 Capital-file is a clojure library built on top of [capital](https://github.com/doubleelbow/capital) that provides cacheable file reads.
 
@@ -61,5 +61,4 @@ If you'd like to help but don't know where to start, here are some suggestions:
 
 Copyright © 2018 doubleelbow
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
